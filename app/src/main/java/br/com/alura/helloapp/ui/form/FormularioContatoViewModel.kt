@@ -14,6 +14,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -31,7 +32,9 @@ class FormularioContatoViewModel @Inject constructor(
 
 
     init {
-        carregaContato()
+        viewModelScope.launch {
+            carregaContato()
+        }
 
         _uiState.update { state ->
             state.copy(onNomeMudou = {
@@ -95,11 +98,11 @@ class FormularioContatoViewModel @Inject constructor(
         }
     }
 
-    private fun carregaContato() {
-        viewModelScope.launch {
-            idContato?.let {
-                val contato = contatoDao.buscaPorId(it)
-                contato?.let { contato ->
+    private suspend fun carregaContato() {
+        idContato?.let {
+            val contato = contatoDao.buscaPorId(it)
+            contato.collect {
+                it?.let { contato ->
                     with(contato) {
                         _uiState.value = uiState.value.copy(
                             id = id,

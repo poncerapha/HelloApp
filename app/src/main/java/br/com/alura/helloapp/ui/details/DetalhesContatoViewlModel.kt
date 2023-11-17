@@ -10,6 +10,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 @HiltViewModel
@@ -31,10 +32,10 @@ class DetalhesContatoViewlModel @Inject constructor(
     }
 
     private suspend fun carregaContato() {
-        viewModelScope.launch {
-            idContato?.let {
-                val contato = contatoDao.buscaPorId(it)
-                contato?.let { contato ->
+        idContato?.let {
+            val contato = contatoDao.buscaPorId(it)
+            contato.collect {
+                it?.let { contato ->
                     with(contato) {
                         _uiState.value = uiState.value.copy(
                             id = id,
