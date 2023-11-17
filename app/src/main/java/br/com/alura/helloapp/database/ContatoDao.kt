@@ -21,4 +21,7 @@ interface ContatoDao {
 
     @Query("DELETE FROM Contato WHERE id = :id")
     suspend fun deletaContato(id: Long)
+
+    @Query("SELECT * FROM Contato WHERE nome like :valor || '%'  ")
+    fun buscaParcial(valor: String): Flow<List<Contato>>
 }

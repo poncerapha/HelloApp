@@ -2,6 +2,7 @@ package br.com.alura.helloapp.navigation
 
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -12,6 +13,7 @@ import br.com.alura.helloapp.ui.home.ListaContatosTela
 import br.com.alura.helloapp.ui.home.ListaContatosViewModel
 import br.com.alura.helloapp.ui.navegaParaDetalhes
 import br.com.alura.helloapp.ui.navegaParaFormularioContato
+import kotlinx.coroutines.launch
 
 fun NavGraphBuilder.homeGraph(
     navController: NavHostController
@@ -23,9 +25,15 @@ fun NavGraphBuilder.homeGraph(
         composable(route = DestinosHelloApp.ListaContatos.rota) {
             val viewModel = hiltViewModel<ListaContatosViewModel>()
             val state by viewModel.uiState.collectAsState()
+            val coroutineScope = rememberCoroutineScope()
 
             ListaContatosTela(
                 state = state,
+                onClickBusca = { valorBusca ->
+                    coroutineScope.launch {
+                        viewModel.buscarParcialmente(valorBusca)
+                    }
+                },
                 onClickAbreDetalhes = { idContato ->
                     navController.navegaParaDetalhes(idContato)
                 },

@@ -5,11 +5,17 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,9 +37,15 @@ fun ListaContatosTela(
     onClickDesloga: () -> Unit = {},
     onClickAbreDetalhes: (Long) -> Unit = {},
     onClickAbreCadastro: () -> Unit = {},
+    onClickBusca: (valor: String) -> Unit = {}
 ) {
     Scaffold(
-        topBar = { AppBarListaContatos(onClickDesloga = onClickDesloga) },
+        topBar = {
+            AppBarListaContatos(
+                onClickDesloga = onClickDesloga,
+                onClickBusca = { valorBusca -> onClickBusca(valorBusca) }
+            )
+        },
         floatingActionButton = {
             FloatingActionButton(
                 backgroundColor = MaterialTheme.colors.primary,
@@ -57,9 +69,42 @@ fun ListaContatosTela(
 }
 
 @Composable
-fun AppBarListaContatos(onClickDesloga: () -> Unit) {
+fun AppBarListaContatos(onClickDesloga: () -> Unit, onClickBusca: (valor: String) -> Unit) {
     TopAppBar(
-        title = { Text(text = stringResource(id = R.string.nome_do_app)) },
+        title = {
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+                    .padding(bottom = 4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                var textoDaBusca by remember { mutableStateOf("") }
+
+                OutlinedTextField(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(),
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Search, contentDescription = null,
+                        )
+                    },
+                    value = textoDaBusca,
+                    onValueChange = {
+                        textoDaBusca = it
+                        onClickBusca(it)
+                    },
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        textColor = Color.Gray,
+                        placeholderColor = Color.LightGray,
+                        backgroundColor = Color.White
+                    ),
+                    placeholder = { Text("Buscar contatos") },
+                    shape = RoundedCornerShape(100)
+                )
+            }
+        },
         actions = {
             IconButton(
                 onClick = onClickDesloga

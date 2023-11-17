@@ -15,7 +15,6 @@ import kotlinx.coroutines.launch
 class ListaContatosViewModel @Inject constructor(
     private val contatoDao: ContatoDao
 ) : ViewModel() {
-
     private val _uiState = MutableStateFlow(ListaContatosUiState())
     val uiState: StateFlow<ListaContatosUiState>
         get() = _uiState.asStateFlow()
@@ -28,6 +27,14 @@ class ListaContatosViewModel @Inject constructor(
                     contatos = it
                 )
             }
+        }
+    }
+
+    suspend fun buscarParcialmente(valor: String) {
+        contatoDao.buscaParcial(valor).collect { contatosBuscados ->
+            _uiState.value = _uiState.value.copy(
+                contatos = contatosBuscados
+            )
         }
     }
 }
