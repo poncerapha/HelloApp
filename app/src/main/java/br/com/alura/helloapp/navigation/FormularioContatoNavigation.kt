@@ -38,26 +38,14 @@ fun NavGraphBuilder.formularioContatoGraph(
                     context.getString(R.string.aniversario)
                 )
             }
-            val contatoDao = HelloAppDatabase.getDatabase(context).contatoDao()
 
             val coroutineScope = rememberCoroutineScope()
             FormularioContatoTela(
                 state = state,
                 onClickSalvar = {
-                    with(state) {
-                        coroutineScope.launch {
-                            contatoDao.insere(
-                                Contato(
-                                    nome = nome,
-                                    sobrenome = sobrenome,
-                                    telefone = telefone,
-                                    fotoPerfil = fotoPerfil,
-                                    aniversario = aniversario
-                                )
-                            )
-                        }
+                    coroutineScope.launch {
+                        viewModel.salvarContato()
                     }
-
                     navController.popBackStack()
                 },
                 onCarregarImagem = {

@@ -2,17 +2,25 @@ package br.com.alura.helloapp.ui.form
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import br.com.alura.helloapp.R
+import br.com.alura.helloapp.data.Contato
+import br.com.alura.helloapp.database.ContatoDao
 import br.com.alura.helloapp.extensions.converteParaDate
 import br.com.alura.helloapp.extensions.converteParaString
 import br.com.alura.helloapp.util.ID_CONTATO
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
-
-class FormularioContatoViewModel(
-    savedStateHandle: SavedStateHandle
+@HiltViewModel
+class FormularioContatoViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
+    private val contatoDao: ContatoDao
 ) : ViewModel() {
 
     private val idContato = savedStateHandle.get<Long>(ID_CONTATO)
@@ -23,6 +31,7 @@ class FormularioContatoViewModel(
 
 
     init {
+        carregaContato()
 
         _uiState.update { state ->
             state.copy(onNomeMudou = {
@@ -69,5 +78,41 @@ class FormularioContatoViewModel(
         _uiState.value = _uiState.value.copy(
             fotoPerfil = url, mostrarCaixaDialogoImagem = false
         )
+    }
+
+    suspend fun salvarContato() {
+        with(_uiState.value) {
+            contatoDao.insere(
+                Contato(
+                    id = id,
+                    nome = nome,
+                    sobrenome = sobrenome,
+                    telefone = telefone,
+                    fotoPerfil = fotoPerfil,
+                    aniversario = aniversario
+                )
+            )
+        }
+    }
+
+    private fun carregaContato() {
+        viewModelScope.launch {
+            idContato?.let {
+                val contato = contatoDao.buscaPorId(it)
+                contato?.let { contato ->
+                    with(contato) {
+                        _uiState.value = uiState.value.copy(
+                            id = id,
+                            nome = nome,
+                            sobrenome = sobrenome,
+                            telefone = telefone,
+                            fotoPerfil = fotoPerfil,
+                            aniversario = aniversario,
+                            tituloAppbar = R.string.titulo_editar_contato
+                        )
+                    }
+                }
+            }
+        }
     }
 }

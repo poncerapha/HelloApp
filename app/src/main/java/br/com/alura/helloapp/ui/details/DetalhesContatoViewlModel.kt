@@ -51,5 +51,6 @@ class DetalhesContatoViewlModel @Inject constructor(
     }
 
     suspend fun removeContato() {
+        idContato?.let { contatoDao.deletaContato(it) }
     }
 }
