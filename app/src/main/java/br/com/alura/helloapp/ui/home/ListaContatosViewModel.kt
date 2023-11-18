@@ -2,6 +2,8 @@ package br.com.alura.helloapp.ui.home
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import br.com.alura.helloapp.database.ContatoDao
@@ -11,7 +13,6 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -64,6 +65,12 @@ class ListaContatosViewModel @Inject constructor(
             _uiState.value = _uiState.value.copy(
                 nomeUsuario = it
             )
+        }
+    }
+
+   suspend fun desloga() {
+        dataStore.edit { preferences ->
+            preferences[booleanPreferencesKey("logado")] = false
         }
     }
 }

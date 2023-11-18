@@ -1,6 +1,5 @@
 package br.com.alura.helloapp.navigation
 
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -16,9 +15,9 @@ import br.com.alura.helloapp.DestinosHelloApp
 import br.com.alura.helloapp.preferences.dataStore
 import br.com.alura.helloapp.ui.home.ListaContatosTela
 import br.com.alura.helloapp.ui.home.ListaContatosViewModel
-import br.com.alura.helloapp.ui.navegaLimpo
 import br.com.alura.helloapp.ui.navegaParaDetalhes
 import br.com.alura.helloapp.ui.navegaParaFormularioContato
+import br.com.alura.helloapp.ui.navegaParaLoginDeslogado
 import kotlinx.coroutines.launch
 
 fun NavGraphBuilder.homeGraph(
@@ -49,22 +48,10 @@ fun NavGraphBuilder.homeGraph(
                 },
                 onClickDesloga = {
                     coroutineScope.launch {
-                        dataStore.edit { preferences ->
-                            preferences[booleanPreferencesKey("logado")] = false
-                        }
+                        viewModel.desloga()
+                        navController.navegaParaLoginDeslogado()
                     }
                 })
-
-            LaunchedEffect(Unit) {
-                coroutineScope.launch {
-                    dataStore.data.collect { preferences ->
-                        val logado = preferences[booleanPreferencesKey("logado")]
-                        if (logado != true) {
-                            navController.navegaLimpo(DestinosHelloApp.LoginGraph.rota)
-                        }
-                    }
-                }
-            }
         }
     }
 }

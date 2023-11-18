@@ -11,7 +11,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 @HiltViewModel
@@ -30,7 +29,7 @@ class SplashScreenViewModel @Inject constructor(
     }
 
     private suspend fun definiDestinoInicial() {
-        delay(1500)
+        delay(1000)
         dataStore.data.collect {
             val appState = if( it[LOGADO] == true) {
                 AppState.Logado
